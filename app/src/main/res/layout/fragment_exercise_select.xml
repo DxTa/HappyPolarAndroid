@@ -1,0 +1,53 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.bhorkar.heartratesensor.ExerciseSelectFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:id="@+id/spinnerExercises"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentEnd="false"
+            android:spinnerMode="dialog"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Calorie Target"
+            android:id="@+id/tvCalorieTarget"
+            android:layout_below="@+id/spinnerExercises"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="21dp" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtCalories"
+            android:layout_below="@+id/tvCalorieTarget"
+            android:layout_marginTop="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:inputType="number" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Go"
+            android:id="@+id/btnGo"
+            android:layout_below="@+id/txtCalories"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="81dp" />
+    </RelativeLayout>
+</FrameLayout>
