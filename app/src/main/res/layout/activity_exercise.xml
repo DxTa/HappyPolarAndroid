@@ -6,9 +6,10 @@
     tools:context="com.bhorkar.heartratesensor.ExerciseActivity">
 
     <fragment
-        android:id="@+id/details_fragment"
+        android:id="@+id/exerciseSelectFragment"
         class="com.bhorkar.heartratesensor.ExerciseSelectFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_exercise_select" />
 
 </RelativeLayout>

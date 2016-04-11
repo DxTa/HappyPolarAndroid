@@ -2,12 +2,15 @@ package com.bhorkar.heartratesensor;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.NumberPicker;
+import android.widget.Spinner;
 
 
 /**
@@ -53,6 +56,22 @@ public class ExerciseSelectFragment extends Fragment {
         mListener = null;
     }
 
+
+    /*
+    Click handler for Fragment buttons
+    */
+    public void onButtonClick (View v) {
+        switch (v.getId()) {
+            case R.id.btnGo:
+                Spinner spinnerExerciseType = (Spinner) getView().findViewById(R.id.spinnerExercises);
+                NumberPicker numCalories = (NumberPicker) getView().findViewById(R.id.numCalorieTarget);
+                String exerciseType = spinnerExerciseType.getSelectedItem().toString();
+                Integer targetCalories = numCalories.getValue();
+                mListener.onExerciseSelected(exerciseType, targetCalories);
+                break;
+        }
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -65,6 +84,6 @@ public class ExerciseSelectFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onExerciseSelected(String exerciseType, Integer targetCalories);
     }
 }
