@@ -16,29 +16,25 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class MainActivity extends ActionBarActivity {
+public class PairDeviceActivity extends ActionBarActivity {
 
     private String TAG = "mytag";
 
     private BluetoothAdapter mBtAdapter;
-    private BluetoothGatt mBtGatt;
+    //private BluetoothGatt mBtGatt;
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_pair_device);
 
         BluetoothManager btManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBtAdapter = btManager.getAdapter();
@@ -67,7 +63,7 @@ public class MainActivity extends ActionBarActivity {
                     public void run() {
                         mBtAdapter.stopLeScan(mLeScanCallback);
                     }
-                }, 10000);
+                }, 30000);
 
                 mBtAdapter.startLeScan(mLeScanCallback);
                 break;
@@ -85,14 +81,18 @@ public class MainActivity extends ActionBarActivity {
     private ListView.OnItemClickListener mListViewClickListener = new ListView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            HeartRateDevice heartRateDevice = HeartRateDevice.initializeInstance(getApplicationContext(), mLeDeviceListAdapter.getDevice(position));
+            /*
             if (mBtGatt == null) {
                 BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
-                mBtGatt = device.connectGatt(MainActivity.this, true, mBluetoothGattCallback);
+                mBtGatt = device.connectGatt(PairDeviceActivity.this, true, mBluetoothGattCallback);
                 mBtAdapter.stopLeScan(mLeScanCallback);
             }
+            */
         }
     };
 
+    /*
     private BluetoothGattCallback mBluetoothGattCallback = new BluetoothGattCallback() {
 
         @Override
@@ -134,5 +134,5 @@ public class MainActivity extends ActionBarActivity {
             Log.i(TAG, characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1).toString());
         }
     };
-
+    */
 }

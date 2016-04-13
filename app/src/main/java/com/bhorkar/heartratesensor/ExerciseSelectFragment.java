@@ -2,6 +2,7 @@ package com.bhorkar.heartratesensor;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,19 +10,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ExerciseSelectFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- */
 public class ExerciseSelectFragment extends Fragment {
 
-    private OnFragmentInteractionListener mListener;
+    private OnExerciseFragmentInterface mListener;
 
     public static ExerciseSelectFragment newInstance() {
         return new ExerciseSelectFragment();
@@ -42,12 +39,19 @@ public class ExerciseSelectFragment extends Fragment {
     @Override
     public void onAttach(Activity context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnExerciseFragmentInterface) {
+            mListener = (OnExerciseFragmentInterface) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Button btnGo = (Button) getView().findViewById(R.id.btnGo);
+        btnGo.setOnClickListener(btnClickListener);
     }
 
     @Override
@@ -60,30 +64,23 @@ public class ExerciseSelectFragment extends Fragment {
     /*
     Click handler for Fragment buttons
     */
-    public void onButtonClick (View v) {
-        switch (v.getId()) {
-            case R.id.btnGo:
-                Spinner spinnerExerciseType = (Spinner) getView().findViewById(R.id.spinnerExercises);
-                NumberPicker numCalories = (NumberPicker) getView().findViewById(R.id.numCalorieTarget);
-                String exerciseType = spinnerExerciseType.getSelectedItem().toString();
-                Integer targetCalories = numCalories.getValue();
-                mListener.onExerciseSelected(exerciseType, targetCalories);
-                break;
+    private Button.OnClickListener btnClickListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.btnGo:
+                    Spinner spinnerExerciseType = (Spinner) getView().findViewById(R.id.spinnerExercises);
+                    EditText numCalories = (EditText) getView().findViewById(R.id.numCalorieTarget);
+                    String exerciseType = spinnerExerciseType.getSelectedItem().toString();
+                    try {
+                        Integer targetCalories = Integer.parseInt(numCalories.getText().toString());
+                        mListener.onExerciseSelected(exerciseType, targetCalories);
+                    } catch (NumberFormatException ex) {
+                        Toast.makeText(getActivity(), "Wrong input", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+            }
         }
-    }
+    };
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onExerciseSelected(String exerciseType, Integer targetCalories);
-    }
 }

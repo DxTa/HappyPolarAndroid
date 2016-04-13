@@ -37,17 +37,20 @@
             android:layout_height="wrap_content"
             android:text="Go"
             android:id="@+id/btnGo"
-            android:layout_below="@+id/numCalorieTarget"
+            android:onClick="onButtonClick"
+            android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="54dp"
-            android:onClick="onBtnClick"/>
+            android:layout_marginBottom="105dp" />
 
-        <NumberPicker
+        <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
             android:id="@+id/numCalorieTarget"
-            android:layout_centerVertical="true"
+            android:layout_below="@+id/tvCalorieTarget"
             android:layout_centerHorizontal="true"
-            android:orientation="horizontal" />
+            android:layout_marginTop="43dp" />
+
     </RelativeLayout>
 </FrameLayout>
