@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bhorkar.heartratesensor.ExerciseActivity">
+    tools:context="aaltoeartratesensor.ExerciseActivity">
 
     <fragment
         android:id="@+id/exerciseSelectFragment"
-        class="com.bhorkar.heartratesensor.ExerciseSelectFragment"
+        class="aaltoeartratesensor.ExerciseSelectFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_exercise_select" />

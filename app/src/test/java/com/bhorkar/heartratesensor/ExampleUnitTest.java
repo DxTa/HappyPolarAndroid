@@ -1,4 +1,4 @@
-package com.bhorkar.heartratesensor;
+package com.aalto.happypolar;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.bhorkar.heartratesensor;
+package com.aalto.happypolar;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;

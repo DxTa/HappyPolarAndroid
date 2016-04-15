@@ -1,6 +1,5 @@
-package com.bhorkar.heartratesensor;
+package com.aalto.happypolar;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -10,6 +9,7 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,16 +22,17 @@ public class HeartRateDevice {
 
     private static HeartRateDevice mInstance = null;
 
-    private BluetoothDevice mBtDevice = null;
-    private BluetoothAdapter mBtAdapter;
+    private BluetoothDevice mBtDevice;
     private BluetoothGatt mBtGatt;
     private Boolean isConnected = false;
 
     private Integer mHeartRate = null;
 
     private DeviceConnectionListener connectionListener;
+    private ArrayList<HeartRateListener> heartRateListeners = new ArrayList();
 
-    private HeartRateDevice(Context context, BluetoothDevice btDevice) {
+    private HeartRateDevice(Context context, BluetoothDevice btDevice, DeviceConnectionListener callback) {
+        connectionListener = callback;
         mBtDevice = btDevice;
         mBtGatt = btDevice.connectGatt(context, true, mBluetoothGattCallback);
     }
@@ -44,17 +45,25 @@ public class HeartRateDevice {
         }
     }
 
-    public static HeartRateDevice initializeInstance(Context context, BluetoothDevice btDevice) {
-        mInstance = new HeartRateDevice(context, btDevice);
+    public static HeartRateDevice initializeInstance(Context context, BluetoothDevice btDevice, DeviceConnectionListener callback) {
+        mInstance = new HeartRateDevice(context, btDevice, callback);
         return mInstance;
     }
 
-    public Integer getmHeartRate() {
+    public Integer getHeartRate() {
         return mHeartRate;
     }
 
-    public boolean isConnected() {
-        return isConnected;
+    public static boolean isConnected() {
+        if (mInstance != null) {
+            return mInstance.isConnected;
+        } else {
+            return false;
+        }
+    }
+
+    public BluetoothDevice getBluetoothDevice () {
+        return mBtDevice;
     }
 
     public void disconnect() {
@@ -69,6 +78,16 @@ public class HeartRateDevice {
         mBtGatt.close();
     }
 
+    public void addHeartRateListener (HeartRateListener hrListener) {
+        if (!heartRateListeners.contains(hrListener)) {
+            heartRateListeners.add(hrListener);
+        }
+    }
+
+    public void removeHeartRateListener (HeartRateListener hrListener) {
+        heartRateListeners.remove(hrListener);
+    }
+
     private BluetoothGattCallback mBluetoothGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -76,13 +95,22 @@ public class HeartRateDevice {
             switch (newState) {
                 case BluetoothProfile.STATE_CONNECTED:
                     Log.i(TAG, "Device Connected");
+
+                    isConnected = true;
+
+                    mBtDevice = gatt.getDevice(); //update the device just in case
                     gatt.discoverServices();
-                    connectionListener.deviceConnected();
+
+                    //callback to notify
+                    if (connectionListener != null) {
+                        connectionListener.deviceConnected(gatt.getDevice());
+                        connectionListener = null;
+                    }
                     break;
+
                 case BluetoothProfile.STATE_DISCONNECTED:
                     Log.i(TAG, "Device Disconnected");
                     isConnected = false;
-                    connectionListener.deviceDisconnected();
             }
         }
 
@@ -111,14 +139,25 @@ public class HeartRateDevice {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             super.onCharacteristicChanged(gatt, characteristic);
-            Log.i(TAG, characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1).toString());
+            //Log.i(TAG, characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1).toString());
             mHeartRate = characteristic.getIntValue(BluetoothGattCharacteristic.FORMAT_UINT8, 1);
-        }
 
+            //Notify the HR listeners
+            for (HeartRateListener hrListener : heartRateListeners) {
+                hrListener.HeartRateUpdated(mHeartRate);
+            }
+        }
     };
 
+
+    /*
+    * Interfaces for callers
+    */
     public interface DeviceConnectionListener {
-        void deviceConnected();
-        void deviceDisconnected();
+        void deviceConnected(BluetoothDevice device);
+    }
+
+    public interface HeartRateListener {
+        void HeartRateUpdated (Integer heartRate);
     }
 }

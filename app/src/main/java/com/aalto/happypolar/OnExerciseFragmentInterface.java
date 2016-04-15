@@ -1,4 +1,4 @@
-package com.bhorkar.heartratesensor;
+package com.aalto.happypolar;
 
 /**
  * Created by Gaurav on 12-Apr-16.

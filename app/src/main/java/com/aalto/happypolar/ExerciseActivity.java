@@ -1,16 +1,15 @@
-package com.bhorkar.heartratesensor;
+package com.aalto.happypolar;
 
-import android.app.FragmentTransaction;
-import android.net.Uri;
-
+import android.os.PowerManager;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 
 public class ExerciseActivity extends FragmentActivity implements OnExerciseFragmentInterface {
 
     public static final String EXERCISE_TYPE = "EXERCISE_TYPE";
     public static final String TARGET_CALORIES = "TARGET_CALORIES";
+
+    PowerManager.WakeLock mWakeLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +34,16 @@ public class ExerciseActivity extends FragmentActivity implements OnExerciseFrag
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, exerciseSelectFragment).commit();
         }
+
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "HappyPolarWakeLockTag");
+        mWakeLock.acquire();
+    }
+
+    @Override
+    protected void onDestroy () {
+        mWakeLock.release();
+        super.onDestroy();
     }
 
     /*

@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bhorkar.heartratesensor.ExerciseProgressFragment">
+    tools:context="com.aalto.happypolar.ExerciseProgressFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -16,8 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Running"
-            android:id="@+id/textView7"
+            android:text="~"
+            android:id="@+id/tvExerciseType"
             android:layout_gravity="center_horizontal" />
 
         <TextView
@@ -39,14 +39,14 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="00:00:00"
-            android:id="@+id/textView2"
+            android:id="@+id/tvTime"
             android:layout_gravity="center_horizontal" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="hh:mm:ss"
+            android:text="Time elapsed"
             android:id="@+id/textView4"
             android:layout_gravity="center_horizontal" />
 
@@ -60,9 +60,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="59"
-            android:id="@+id/textView3"
-            android:layout_gravity="center_horizontal" />
+            android:text="~"
+            android:id="@+id/tvCalories"
+            android:layout_gravity="center_horizontal"
+            android:textSize="30dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -82,9 +83,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="130"
-            android:id="@+id/textView5"
-            android:layout_gravity="center_horizontal" />
+            android:text="~"
+            android:id="@+id/tvHeartRate"
+            android:layout_gravity="center_horizontal"
+            android:textSize="30dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -101,7 +103,7 @@
             android:minHeight="10dp" />
 
         <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chart"
+            android:id="@+id/lineChartHeartRate"
             android:layout_width="match_parent"
             android:layout_height="200dp" />
 
