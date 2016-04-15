@@ -29,7 +29,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="Hello, Gaurav!"
-                    android:id="@+id/textView9"
+                    android:id="@+id/tvGreeting"
                     android:layout_gravity="center_vertical"
                     android:textSize="25dp" />
 

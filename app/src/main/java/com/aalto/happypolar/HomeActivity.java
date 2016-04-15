@@ -17,12 +17,19 @@ public class HomeActivity extends ActionBarActivity {
     private TextView tvHeartRate;
     private HeartRateDevice hrDevice;
 
+    private UserProfile mUserProfile;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         tvHeartRate = (TextView)findViewById(R.id.tvHeartRate);
         tvHeartRate.setText("~");
+
+        mUserProfile = UserProfile.getInstance();
+
+        TextView tvGreeting = (TextView) findViewById(R.id.tvGreeting);
+        tvGreeting.setText("Hello, " + mUserProfile.getName().split(" ")[0]); //only display the first name
 
         if (!HeartRateDevice.isConnected()) {
             pairHeartRateDevice();

@@ -2,10 +2,12 @@ package com.aalto.happypolar;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -19,8 +21,6 @@ import android.widget.Toast;
 
 import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
-import com.sromku.simple.fb.SimpleFacebookConfiguration;
-import com.sromku.simple.fb.actions.Cursor;
 import com.sromku.simple.fb.entities.Profile;
 import com.sromku.simple.fb.listeners.OnFriendsListener;
 import com.sromku.simple.fb.listeners.OnLoginListener;
@@ -36,9 +36,13 @@ public class LoginActivity extends Activity {
     private SimpleFacebook mSimpleFacebook;
     private Menu mMenu;
 
+    private boolean mIsLoggedIn = false;
+
     private TextView tvFacebook;
     private EditText editName, editEmail, editAge, editHeight, editWeight;
     private RadioButton radioMale, radioFemale;
+
+    private String mFbAccessToken, mFbId;
 
 
     @Override
@@ -69,22 +73,10 @@ public class LoginActivity extends Activity {
         radioMale = (RadioButton) findViewById(R.id.radioMale);
         radioFemale = (RadioButton) findViewById(R.id.radioFemale);
 
-        Permission[] permissions = new Permission[] {
-                Permission.EMAIL,
-                Permission.USER_FRIENDS,
-                Permission.PUBLIC_PROFILE
-        };
-
-        SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
-                .setAppId("495899663951920")
-                .setNamespace("happypolar")
-                .setPermissions(permissions)
-                .build();
-
-        SimpleFacebook.setConfiguration(configuration);
         mSimpleFacebook = SimpleFacebook.getInstance(this);
-
         mSimpleFacebook.login(onLoginListener);
+
+        //getActionBar().show();
     }
 
     @Override
@@ -95,9 +87,10 @@ public class LoginActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_login, menu);
-        menu.findItem(R.id.menu_facebook).setEnabled(false);
+        //menu.findItem(R.id.menu_facebook).setEnabled(false);
         mMenu = menu;
         return true;
     }
@@ -112,82 +105,175 @@ public class LoginActivity extends Activity {
         return true;
     }
 
-    public void buttonClick (View v) {
-        switch (v.getId()) {
-            case R.id.login:
-                mSimpleFacebook.login(onLoginListener);
-                break;
+    /*
+    * Button Click handler
+    * */
+    public void onButtonClick(View v) {
+        boolean isOk = true;
+        if (editName.getText().toString() == "") {
+            isOk = false;
+        }
+        if (editEmail.getText().toString() == "") {
+            isOk = false;
+        }
+        if (editAge.getText().toString() == "") {
+            isOk = false;
+        }
+        if (editWeight.getText().toString() == "") {
+            isOk = false;
+        }
+        if (editHeight.getText().toString() == "") {
+            isOk = false;
+        }
 
-            case R.id.logout:
-                mSimpleFacebook.logout(onLogoutListener);
-                break;
+        if (isOk == false) {
+            Toast.makeText(LoginActivity.this, "All fields are compulsory", Toast.LENGTH_SHORT).show();
+        } else {
+            if (!mIsLoggedIn) {
+                //If not logged in, then return;
+                Toast.makeText(LoginActivity.this, "Connection to Facebook required", Toast.LENGTH_SHORT).show();
+            } else {
+                String gender;
+                if (radioMale.isChecked()) {
+                    gender = UserProfile.MALE;
+                } else {
+                    gender = UserProfile.FEMALE;
+                }
 
-            case R.id.friends:
-                mSimpleFacebook.getFriends(onFriendsListener);
-                mSimpleFacebook.getProfile(onProfileListener);
+                UserProfile.initialize(
+                        editName.getText().toString(),
+                        Integer.parseInt(editAge.getText().toString()),
+                        gender,
+                        editEmail.getText().toString(),
+                        Long.parseLong(editWeight.getText().toString()),
+                        Long.parseLong(editHeight.getText().toString()),
+                        mFbAccessToken,
+                        mFbId
+                );
+
+                UserProfile.getInstance().save(this);
+                Toast.makeText(LoginActivity.this, "User Profile saved!", Toast.LENGTH_SHORT).show();
+
+                //Start the home activity
+                Intent intent  = new Intent(LoginActivity.this, HomeActivity.class);
+                startActivity(intent);
+
+                //Close this activitiy
+                LoginActivity.this.finish();
+            }
 
         }
     }
 
-    private OnProfileListener onProfileListener = new OnProfileListener() {
-        @Override
-        public void onComplete(Profile response) {
-            super.onComplete(response);
 
-        }
-    };
-
+    /*Required by Facebook library*/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /*
+    * Facebook callback listeners
+    * */
+
     OnLoginListener onLoginListener = new OnLoginListener() {
         @Override
         public void onLogin(String accessToken, List<Permission> acceptedPermissions, List<Permission> declinedPermissions) {
-            // change the state of the button or do whatever you want
             Log.i("myapp", "Access Token: " + accessToken);
-            mMenu.findItem(R.id.menu_facebook).setEnabled(false);
+            //mMenu.findItem(R.id.menu_facebook).setEnabled(false);
             Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
             tvFacebook.setText("Connected to Facebook!");
 
+            mIsLoggedIn = true;
+            mFbAccessToken = accessToken;
+
+            //Initialize UserProfile from settings and compare access tokens
+            try {
+                UserProfile userProfile = UserProfile.initialize(LoginActivity.this);
+
+                if (userProfile.getFbAccessToken().equals(accessToken)) {
+                    //if not equal then update the settings with new token
+                    userProfile.setFbAccessToken(accessToken);
+                    userProfile.save(LoginActivity.this);
+                }
+
+                Toast.makeText(LoginActivity.this, "Loaded saved user profile", Toast.LENGTH_SHORT).show();
+
+                //If no exception, then settings exist
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                startActivity(intent);
+                LoginActivity.this.finish();
+
+            } catch (Settings.SettingNotFoundException e) {
+
+                //On login get friends and profile.
+                mSimpleFacebook.getProfile(onProfileListener);
+                mSimpleFacebook.getFriends(onFriendsListener);
+
+            }
         }
 
         @Override
         public void onCancel() {
             // user canceled the dialog
             Log.i("myapp", "login cancel");
-            mMenu.findItem(R.id.menu_facebook).setEnabled(true);
+            //mMenu.findItem(R.id.menu_facebook).setEnabled(true);
             Toast.makeText(LoginActivity.this, "Login canceled", Toast.LENGTH_SHORT).show();
             tvFacebook.setText("Not connected to Facebook");
+            mIsLoggedIn = false;
         }
 
         @Override
         public void onFail(String reason) {
             // failed to login
             Log.i("myapp", "login fail");
-            mMenu.findItem(R.id.menu_facebook).setEnabled(true);
+            //mMenu.findItem(R.id.menu_facebook).setEnabled(true);
             Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
             tvFacebook.setText("Not connected to FB. Login failed.");
+            mIsLoggedIn = false;
         }
 
         @Override
         public void onException(Throwable throwable) {
             // exception from facebook
-            mMenu.findItem(R.id.menu_facebook).setEnabled(true);
+            //mMenu.findItem(R.id.menu_facebook).setEnabled(true);
+            Log.d("myapp", throwable.toString());
             Toast.makeText(LoginActivity.this, "ERROR: Facebook Login exception", Toast.LENGTH_SHORT).show();
+            mIsLoggedIn = false;
         }
 
     };
 
+    /*
+    * Listener for getFriends
+    * */
     private OnFriendsListener onFriendsListener = new OnFriendsListener() {
         @Override
         public void onComplete(List<Profile> response) {
-            Log.i("myapp", "No of frns: " + response.size());
+            Log.i("myapp", "Friends:");
+            for (Profile p : response) {
+                Log.i("myapp", "Friend: " + p.getName());
+            }
         }
     };
 
+    /*
+    * Listener for getProfile
+    * */
+    private OnProfileListener onProfileListener = new OnProfileListener() {
+        @Override
+        public void onComplete(Profile response) {
+            super.onComplete(response);
+            editName.setText(response.getName());
+            editEmail.setText(response.getEmail());
+            mFbId = response.getId();
+        }
+    };
+
+    /*
+    * Listener for logout
+    * */
     private OnLogoutListener onLogoutListener = new OnLogoutListener() {
         @Override
         public void onLogout() {
