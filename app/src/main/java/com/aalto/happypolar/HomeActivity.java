@@ -19,6 +19,8 @@ public class HomeActivity extends ActionBarActivity {
 
     private UserProfile mUserProfile;
 
+    private boolean dialogClicked = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +47,7 @@ public class HomeActivity extends ActionBarActivity {
         dialogBuilder.setPositiveButton("Connect", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                dialogClicked = true;
                 Intent intent = new Intent(HomeActivity.this, PairDeviceActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -55,6 +58,15 @@ public class HomeActivity extends ActionBarActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 HomeActivity.this.finish();
+            }
+        });
+
+        dialogBuilder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if (!dialogClicked) {
+                    dialogBuilder.create().show();
+                }
             }
         });
 

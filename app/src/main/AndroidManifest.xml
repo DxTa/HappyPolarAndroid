@@ -28,8 +28,7 @@
 
         <activity
             android:name=".ExerciseActivity"
-            android:label="Happy Polar - Exercise"
-            android:theme="@style/AppTheme"/>
+            android:label="Happy Polar - Exercise" />
 
         <activity
             android:name=".HomeActivity"

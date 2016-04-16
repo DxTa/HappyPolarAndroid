@@ -10,7 +10,8 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -32,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:minHeight="10dp" />
+            android:minHeight="10dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -79,14 +80,29 @@
             android:layout_gravity="center_horizontal"
             android:minHeight="10dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="~"
-            android:id="@+id/tvHeartRate"
-            android:layout_gravity="center_horizontal"
-            android:textSize="30dp" />
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="~"
+                android:id="@+id/tvHeartRate"
+                android:layout_gravity="center_vertical"
+                android:textSize="30dp"
+                android:gravity="center_vertical"/>
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_heart"
+                android:layout_gravity="center_vertical"/>
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -115,14 +131,16 @@
             android:gravity="center_horizontal">
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
                 android:text="Pause"
+                android:background="@drawable/button_round"
                 android:id="@+id/button" />
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:background="@drawable/button_round"
                 android:text="Stop"
                 android:id="@+id/button2" />
         </LinearLayout>

@@ -29,7 +29,16 @@ public class ExerciseProgressFragment extends Fragment {
 
     private Handler mHandlerTimer = new Handler();
 
-    private final int tickDelay = 1000;
+    //TIMER DELAY
+    private final int tickDelay = 2000;
+    private final int step = 2; //step counter (usually should correspond to timer delay (if 2000 then 2)
+
+    private UserProfile mUserProfile;
+    private HeartRateDevice mHeartRateDevice;
+
+    private Long mWeight;
+    private Integer mAge;
+    private boolean mIsMale;
 
     public ExerciseProgressFragment() {
         // Required empty public constructor
@@ -60,6 +69,13 @@ public class ExerciseProgressFragment extends Fragment {
         mtargetCalories = getArguments().getInt(ExerciseActivity.TARGET_CALORIES);
         String exerciseType = getArguments().getString(ExerciseActivity.EXERCISE_TYPE);
 
+        mUserProfile = UserProfile.getInstance();
+        mHeartRateDevice = HeartRateDevice.getInstance();
+
+        mWeight = mUserProfile.getWeight();
+        mAge = mUserProfile.getAge();
+        mIsMale = (mUserProfile.getGender().equals(UserProfile.MALE)) ? true : false;
+
         TextView tvExerciseType = (TextView) getActivity().findViewById(R.id.tvExerciseType);
         tvExerciseType.setText(exerciseType);
 
@@ -67,7 +83,7 @@ public class ExerciseProgressFragment extends Fragment {
         tvCalories = (TextView) getActivity().findViewById(R.id.tvCalories);
         tvHeartRate = (TextView) getActivity().findViewById(R.id.tvHeartRate);
 
-        /*Start a timer for every second*/
+        /*Start a timer for specified delay*/
         mSecondsElapsed = 0;
         mHandlerTimer.postDelayed(runnableTickTok, tickDelay);
     }
@@ -79,21 +95,47 @@ public class ExerciseProgressFragment extends Fragment {
     }
 
 
+    private Integer mheartRate;
+    private Integer mHeartRateSum=0;
+    private Integer mHeartRateAvg;
+    private Double mCaloriesBurned = 0.0;
     private Runnable runnableTickTok = new Runnable() {
         @Override
         public void run() {
             //Runs every second
+            mSecondsElapsed += step;  //can also act as a counter
 
             //Do work here
-            //Increment timer, calculate calories, and display information.
-            mSecondsElapsed++;
-            tvHeartRate.setText(HeartRateDevice.getInstance().getHeartRate().toString());
+            //calculate calories, and display information.
+            mheartRate = mHeartRateDevice.getHeartRate();
+            mHeartRateSum += mheartRate;
+            mHeartRateAvg = mHeartRateSum / mSecondsElapsed;
 
-            tvTimer.setText(DateUtils.formatElapsedTime(mSecondsElapsed));
+            //Calculate calories every 10 seconds
+            if (mSecondsElapsed % 10 == 0) {
+                if (mIsMale) {
+                    mCaloriesBurned = ((-55.0969 + (0.6309 * mHeartRateAvg) + (0.1988 * mWeight) + (0.2017 * mAge)) / 4.184) * (mSecondsElapsed / 60);
+                } else {
+                    mCaloriesBurned = ((-20.4022 + (0.4472 * mHeartRateAvg) - (0.1263 * mWeight) + (0.074 * mAge)) / 4.184) * (mSecondsElapsed / 60);
+                }
+            }
 
+            updateUI();
             //Run again after 1 second
             mHandlerTimer.postDelayed(this, tickDelay);
         }
     };
+
+    private void updateUI() {
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tvHeartRate.setText(mheartRate.toString());
+                tvCalories.setText(mCaloriesBurned.toString());
+                tvTimer.setText(DateUtils.formatElapsedTime(mSecondsElapsed));
+            }
+        });
+    }
 
 }

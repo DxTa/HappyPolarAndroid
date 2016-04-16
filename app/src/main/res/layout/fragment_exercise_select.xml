@@ -6,51 +6,81 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center">
+        android:layout_height="match_parent">
 
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="100dp"
-            android:id="@+id/spinnerExercises"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentEnd="false"
-            android:spinnerMode="dialog"
-            android:gravity="center"
-            android:entries="@array/exercise_types"/>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Calorie Target"
-            android:id="@+id/tvCalorieTarget"
-            android:layout_below="@+id/spinnerExercises"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="21dp" />
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinnerExercises"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentEnd="false"
+                android:spinnerMode="dropdown"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="gravity"
+                android:layout_marginTop="20dp"/>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Go"
-            android:id="@+id/btnGo"
-            android:onClick="onButtonClick"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="105dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:id="@+id/tvDescription"
+                android:nestedScrollingEnabled="true"
+                android:layout_margin="20dp"
+                android:textSize="19dp"
+                android:text="Exercise description"/>
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:id="@+id/numCalorieTarget"
-            android:layout_below="@+id/tvCalorieTarget"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="43dp" />
+            <ImageView
+                android:id="@+id/imageExercise"
+                android:layout_width="350dp"
+                android:layout_height="250dp"
+                android:scaleType="fitCenter"
+                android:layout_gravity="center_horizontal"/>
 
-    </RelativeLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Calorie Target"
+                android:id="@+id/tvCalorieTarget"
+                android:layout_below="@+id/spinnerExercises"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:inputType="number"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:hint="Eg. 50"
+                android:ems="10"
+                android:id="@+id/numCalorieTarget"
+                android:layout_below="@+id/tvCalorieTarget"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="2dp" />
+
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/button_round"
+                android:text="Go"
+                android:id="@+id/btnGo"
+                android:onClick="onButtonClick"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"/>
+
+        </LinearLayout>
+
+    </ScrollView>
 </FrameLayout>

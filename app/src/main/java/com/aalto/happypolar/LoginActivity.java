@@ -2,7 +2,6 @@ package com.aalto.happypolar;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -19,6 +18,9 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.entities.Profile;
@@ -27,9 +29,14 @@ import com.sromku.simple.fb.listeners.OnLoginListener;
 import com.sromku.simple.fb.listeners.OnLogoutListener;
 import com.sromku.simple.fb.listeners.OnProfileListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 public class LoginActivity extends Activity {
 
@@ -140,28 +147,57 @@ public class LoginActivity extends Activity {
                     gender = UserProfile.FEMALE;
                 }
 
-                UserProfile.initialize(
-                        editName.getText().toString(),
-                        Integer.parseInt(editAge.getText().toString()),
-                        gender,
-                        editEmail.getText().toString(),
-                        Long.parseLong(editWeight.getText().toString()),
-                        Long.parseLong(editHeight.getText().toString()),
-                        mFbAccessToken,
-                        mFbId
-                );
+                // Posting user creation request to the server
+                AsyncHttpClient client = new AsyncHttpClient();
+                RequestParams postParams = new RequestParams();
+                postParams.add("name", editName.getText().toString());
+                postParams.add("age", editAge.getText().toString());
+                postParams.add("height", editHeight.getText().toString());
+                postParams.add("weight", editWeight.getText().toString());
+                postParams.add("gender", gender);
+                //TODO Add more after API is updated by backend team
 
-                UserProfile.getInstance().save(this);
-                Toast.makeText(LoginActivity.this, "User Profile saved!", Toast.LENGTH_SHORT).show();
+                final String sex = gender;
+                client.post(MyApplication.SERVER_URL + "/users", postParams, new AsyncHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                        try {
+                            JSONObject response = new JSONObject(new String(responseBody));
+                            String userId = response.getJSONObject("user").getString("_id");
 
-                //Start the home activity
-                Intent intent  = new Intent(LoginActivity.this, HomeActivity.class);
-                startActivity(intent);
+                            UserProfile.initialize(
+                                    userId,
+                                    editName.getText().toString(),
+                                    Integer.parseInt(editAge.getText().toString()),
+                                    sex,
+                                    editEmail.getText().toString(),
+                                    Long.parseLong(editWeight.getText().toString()),
+                                    Long.parseLong(editHeight.getText().toString()),
+                                    mFbAccessToken,
+                                    mFbId
+                            );
 
-                //Close this activitiy
-                LoginActivity.this.finish();
+                            //Save to settings
+                            UserProfile.getInstance().save(LoginActivity.this);
+                            Toast.makeText(LoginActivity.this, "User Profile saved!", Toast.LENGTH_SHORT).show();
+
+                            //Start the home activity
+                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                            startActivity(intent);
+
+                            //Close this activitiy
+                            LoginActivity.this.finish();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                        Toast.makeText(LoginActivity.this, "Could not register user. Error: " + statusCode, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-
         }
     }
 
@@ -267,6 +303,7 @@ public class LoginActivity extends Activity {
             super.onComplete(response);
             editName.setText(response.getName());
             editEmail.setText(response.getEmail());
+
             mFbId = response.getId();
         }
     };

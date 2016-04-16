@@ -14,6 +14,7 @@ import com.sromku.simple.fb.entities.User;
 public class UserProfile {
 
     /* settings Keys */
+    public static final String ID = "id";
     public static final String NAME = "name";
     public static final String AGE = "age";
     public static final String GENDER = "gender";
@@ -23,11 +24,12 @@ public class UserProfile {
     public static final String FB_ACCESS_TOKEN = "fb_access_token";
     public static final String FB_ID = "fb_id";
 
-    public static final String MALE = "MALE";
-    public static final String FEMALE = "FEMALE";
+    public static final String MALE = "male";
+    public static final String FEMALE = "female";
 
     private static UserProfile mInstance = null;
 
+    private String mId;
     private String mName;
     private Integer mAge;
     private Long mWeight;
@@ -37,7 +39,8 @@ public class UserProfile {
     private String mFbAccessToken;
     private String mFbId;
 
-    private UserProfile(String name, Integer age, String gender, String email, Long weight, Long height, String fbAccessToken, String fbId) {
+    private UserProfile(String id, String name, Integer age, String gender, String email, Long weight, Long height, String fbAccessToken, String fbId) {
+        mId = id;
         mName = name;
         mAge = age;
         mGender = gender;
@@ -56,8 +59,8 @@ public class UserProfile {
         }
     }
 
-    public static UserProfile initialize(String name, Integer age, String gender, String email, Long weight, Long height, String fbAccessToken, String fbId) {
-        mInstance = new UserProfile(name, age, gender, email,  weight, height, fbAccessToken, fbId);
+    public static UserProfile initialize(String id, String name, Integer age, String gender, String email, Long weight, Long height, String fbAccessToken, String fbId) {
+        mInstance = new UserProfile(id, name, age, gender, email,  weight, height, fbAccessToken, fbId);
         return mInstance;
     }
 
@@ -70,6 +73,7 @@ public class UserProfile {
             throw new Settings.SettingNotFoundException("Setting is not initialized");
         }
         mInstance = new UserProfile(
+                settings.getString(UserProfile.ID, ""),
                 settings.getString(UserProfile.NAME, ""),
                 settings.getInt(UserProfile.AGE, 0),
                 settings.getString(UserProfile.GENDER, ""),
@@ -92,6 +96,7 @@ public class UserProfile {
         }
         SharedPreferences settings = context.getSharedPreferences(MyApplication.SETTINGS_NAME, 0);
         SharedPreferences.Editor settingsEditor = settings.edit();
+        settingsEditor.putString(UserProfile.ID, mId);
         settingsEditor.putString(UserProfile.NAME, mName);
         settingsEditor.putInt(UserProfile.AGE, mAge);
         settingsEditor.putString(UserProfile.EMAIL, mEmail);
