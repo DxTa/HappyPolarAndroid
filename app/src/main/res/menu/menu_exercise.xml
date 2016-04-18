@@ -3,8 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.aalto.happypolar.ExerciseActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/menu_pair_device"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="Pair HR Device"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_profile"
+        android:title="Profile"
+        app:showAsAction="never"/>
+
 </menu>

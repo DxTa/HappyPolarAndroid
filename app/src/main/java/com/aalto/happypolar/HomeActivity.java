@@ -24,6 +24,7 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("myapp", "Home activity onCreate");
         setContentView(R.layout.activity_home);
         tvHeartRate = (TextView)findViewById(R.id.tvHeartRate);
         tvHeartRate.setText("~");
@@ -96,7 +97,7 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     protected void onDestroy () {
         super.onDestroy();
-        Log.i("mytag", "Destroyed");
+        Log.i("myapp", "Destroyed");
     }
 
     @Override
@@ -136,7 +137,7 @@ public class HomeActivity extends ActionBarActivity {
                     tvHeartRate.invalidate();
                 }
             });
-            Log.i("mytag", "Heart Rate " + heartRate.toString());
+            Log.i("myapp", "Heart Rate " + heartRate.toString());
         }
     };
 }

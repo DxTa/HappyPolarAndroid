@@ -144,4 +144,8 @@ public class UserProfile {
     public String getFbId() {
         return mFbId;
     }
+
+    public String getId() {
+        return mId;
+    }
 }

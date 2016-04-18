@@ -159,9 +159,12 @@ public class ExerciseSelectFragment extends Fragment {
                     String exerciseType = spinnerExerciseType.getSelectedItem().toString();
                     try {
                         Integer targetCalories = Integer.parseInt(numCalories.getText().toString());
-                        mListener.onExerciseSelected(exerciseType, targetCalories);
+                        String exerciseId = jsonExercises.getJSONObject(spinnerExerciseType.getSelectedItemPosition()).getString("_id");
+                        mListener.onExerciseSelected(exerciseId, exerciseType, targetCalories);
                     } catch (NumberFormatException ex) {
                         Toast.makeText(getActivity(), "Wrong input", Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                     break;
             }

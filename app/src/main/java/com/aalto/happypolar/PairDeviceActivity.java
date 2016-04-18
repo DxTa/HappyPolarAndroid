@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 public class PairDeviceActivity extends ActionBarActivity {
 
-    private String TAG = "mytag";
+    private String TAG = "myapp";
 
     private BluetoothAdapter mBtAdapter;
     private LeDeviceListAdapter mLeDeviceListAdapter;

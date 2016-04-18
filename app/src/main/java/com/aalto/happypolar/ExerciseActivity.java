@@ -1,15 +1,25 @@
 package com.aalto.happypolar;
 
+import android.app.FragmentTransaction;
 import android.os.PowerManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+
+import org.json.JSONObject;
 
 public class ExerciseActivity extends FragmentActivity implements OnExerciseFragmentInterface {
 
     public static final String EXERCISE_TYPE = "EXERCISE_TYPE";
     public static final String TARGET_CALORIES = "TARGET_CALORIES";
+    public static final String EXERCISE_ID = "EXERCISE_ID";
+    public static final String CALORIES_BURNED = "CALORIES_BURNED";
+    public static final String HEART_RATE_AVG = "HEART_RATE_AVG";
+    public static final String TIME_ELAPSED = "TIME_ELAPSED";
+    public static final String JSON_SESSION = "JSON_SESSION";
 
     PowerManager.WakeLock mWakeLock;
+    ExerciseProgressFragment exerciseProgressFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,15 +56,24 @@ public class ExerciseActivity extends FragmentActivity implements OnExerciseFrag
         super.onDestroy();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (exerciseProgressFragment != null) {
+            exerciseProgressFragment.onButtonClick(findViewById(R.id.btnCancel));
+        }
+    }
+
     /*
     * Event fired by the Exercise Selection fragment
     * Action - Detach the fragment, and start the exercise fragment
     * */
     @Override
-    public void onExerciseSelected(String exerciseType, Integer targetCalories) {
+    public void onExerciseSelected(String exerciseId, String exerciseType, Integer targetCalories) {
         /* Starting the exercise progress fragment */
-        ExerciseProgressFragment exerciseProgressFragment = new ExerciseProgressFragment();
+        exerciseProgressFragment = new ExerciseProgressFragment();
         Bundle args = new Bundle();
+        args.putString(EXERCISE_ID, exerciseId);
         args.putString(EXERCISE_TYPE, exerciseType);
         args.putInt(TARGET_CALORIES, targetCalories);
         exerciseProgressFragment.setArguments(args);
@@ -63,5 +82,28 @@ public class ExerciseActivity extends FragmentActivity implements OnExerciseFrag
         transaction.replace(R.id.fragment_container, exerciseProgressFragment);
         //transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void onExerciseFinished(String exerciseId, String exerciseType, Integer targetCalories, Double caloriesBurned, Integer heartRateAvg, String timeElapsed, JSONObject jsonSession) {
+        ExerciseSummaryFragment exerciseSummaryFragment = new ExerciseSummaryFragment();
+        Bundle args = new Bundle();
+        args.putString(EXERCISE_ID, exerciseId);
+        args.putString(EXERCISE_TYPE, exerciseType);
+        args.putInt(TARGET_CALORIES, targetCalories);
+        args.putDouble(CALORIES_BURNED, caloriesBurned);
+        args.putInt(HEART_RATE_AVG, heartRateAvg);
+        args.putString(TIME_ELAPSED, timeElapsed);
+        args.putString(JSON_SESSION, jsonSession.toString());
+        exerciseSummaryFragment.setArguments(args);
+
+        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, exerciseSummaryFragment);
+        transaction.commit();
+    }
+
+    @Override
+    public void onSummaryClose() {
+        this.finish();
     }
 }

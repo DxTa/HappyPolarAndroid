@@ -2,14 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.aalto.happypolar.ExerciseProgressFragment">
-
-    <!-- TODO: Update blank fragment layout -->
+    tools:context="com.aalto.happypolar.ExerciseSummaryFragment">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -29,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="in progress"
+                android:text="Summary"
                 android:id="@+id/textView8"
                 android:layout_gravity="center_horizontal" />
 
@@ -51,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Time elapsed"
+                android:text="Total Time"
                 android:id="@+id/textView4"
                 android:layout_gravity="center_horizontal" />
 
@@ -74,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Calories burned"
+                android:text="Calories Burned / Target"
                 android:id="@+id/textView"
                 android:layout_gravity="center_horizontal" />
 
@@ -112,7 +109,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="heartbeats per minute"
+                android:text="Average Heart Rate (bpm)"
                 android:id="@+id/textView6"
                 android:layout_gravity="center_horizontal" />
 
@@ -127,33 +124,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp" />
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <Button
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_marginTop="20dp"
+                android:text="Close"
+                android:background="@drawable/button_round"
                 android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp">
-
-                <Button
-                    android:layout_width="75dp"
-                    android:layout_height="75dp"
-                    android:text="Cancel"
-                    android:background="@drawable/button_round"
-                    android:id="@+id/btnCancel" />
-
-                <Button
-                    android:layout_width="75dp"
-                    android:layout_height="75dp"
-                    android:background="@drawable/button_round"
-                    android:text="Stop"
-                    android:id="@+id/btnStop" />
-            </LinearLayout>
+                android:id="@+id/btnClose"
+                android:layout_marginBottom="10dp"/>
 
         </LinearLayout>
-
     </ScrollView>
-
-
 </FrameLayout>

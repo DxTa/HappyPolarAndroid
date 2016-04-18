@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 public class HeartRateDevice {
 
-    private String TAG = "mytag";
+    private String TAG = "myapp";
 
     private static HeartRateDevice mInstance = null;
 
