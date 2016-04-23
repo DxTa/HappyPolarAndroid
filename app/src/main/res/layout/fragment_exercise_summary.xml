@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="15dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -119,10 +119,11 @@
                 android:layout_gravity="center_horizontal"
                 android:minHeight="10dp" />
 
-            <com.github.mikephil.charting.charts.LineChart
+            <com.jjoe64.graphview.GraphView
                 android:id="@+id/lineChartHeartRate"
                 android:layout_width="match_parent"
-                android:layout_height="200dp" />
+                android:layout_height="150dip"
+                android:title="Heart Rate" />
 
             <Button
                 android:layout_width="75dp"

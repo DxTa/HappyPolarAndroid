@@ -155,12 +155,12 @@ public class ExerciseSelectFragment extends Fragment {
             switch (v.getId()) {
                 case R.id.btnGo:
                     Spinner spinnerExerciseType = (Spinner) getView().findViewById(R.id.spinnerExercises);
-                    EditText numCalories = (EditText) getView().findViewById(R.id.numCalorieTarget);
+                    //EditText numCalories = (EditText) getView().findViewById(R.id.numCalorieTarget);
                     String exerciseType = spinnerExerciseType.getSelectedItem().toString();
                     try {
-                        Integer targetCalories = Integer.parseInt(numCalories.getText().toString());
+                        //Integer targetCalories = Integer.parseInt(numCalories.getText().toString());
                         String exerciseId = jsonExercises.getJSONObject(spinnerExerciseType.getSelectedItemPosition()).getString("_id");
-                        mListener.onExerciseSelected(exerciseId, exerciseType, targetCalories);
+                        mListener.onExerciseSelected(exerciseId, exerciseType);
                     } catch (NumberFormatException ex) {
                         Toast.makeText(getActivity(), "Wrong input", Toast.LENGTH_SHORT).show();
                     } catch (JSONException e) {

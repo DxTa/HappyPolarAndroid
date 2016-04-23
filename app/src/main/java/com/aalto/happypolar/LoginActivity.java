@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
@@ -49,27 +50,13 @@ public class LoginActivity extends Activity {
     private EditText editName, editEmail, editAge, editHeight, editWeight;
     private RadioButton radioMale, radioFemale;
 
-    private String mFbAccessToken, mFbId;
+    private String mFbAccessToken, mFbId, mUserId;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(
-                    "com.aalto.happypolar",
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-
-        } catch (NoSuchAlgorithmException e) {
-
-        }
 
         tvFacebook = (TextView) findViewById(R.id.tvFacebook);
         editName = (EditText) findViewById(R.id.editName);
@@ -89,7 +76,7 @@ public class LoginActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
-        mSimpleFacebook = SimpleFacebook.getInstance(this);
+        //mSimpleFacebook = SimpleFacebook.getInstance(this);
     }
 
     @Override
@@ -149,6 +136,7 @@ public class LoginActivity extends Activity {
 
                 // Posting user creation request to the server
                 AsyncHttpClient client = new AsyncHttpClient();
+                client.addHeader("authorization", "Bearer " + mFbAccessToken);
                 RequestParams postParams = new RequestParams();
                 postParams.add("name", editName.getText().toString());
                 postParams.add("age", editAge.getText().toString());
@@ -158,15 +146,13 @@ public class LoginActivity extends Activity {
                 //TODO Add more after API is updated by backend team
 
                 final String sex = gender;
-                client.post(MyApplication.SERVER_URL + "/users", postParams, new AsyncHttpResponseHandler() {
+                client.put(MyApplication.SERVER_URL + "/users/" + mUserId, postParams, new JsonHttpResponseHandler() {
                     @Override
-                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
                         try {
-                            JSONObject response = new JSONObject(new String(responseBody));
-                            String userId = response.getJSONObject("user").getString("_id");
-
                             UserProfile.initialize(
-                                    userId,
+                                    response.getString("_id"),
                                     editName.getText().toString(),
                                     Integer.parseInt(editAge.getText().toString()),
                                     sex,
@@ -193,8 +179,9 @@ public class LoginActivity extends Activity {
                     }
 
                     @Override
-                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                        Toast.makeText(LoginActivity.this, "Could not register user. Error: " + statusCode, Toast.LENGTH_SHORT).show();
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                        Toast.makeText(LoginActivity.this, "Could not register user. Error: " + responseString, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -221,7 +208,6 @@ public class LoginActivity extends Activity {
             Toast.makeText(LoginActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
             tvFacebook.setText("Connected to Facebook!");
 
-            mIsLoggedIn = true;
             mFbAccessToken = accessToken;
 
             //Initialize UserProfile from settings and compare access tokens
@@ -244,9 +230,36 @@ public class LoginActivity extends Activity {
             } catch (Settings.SettingNotFoundException e) {
 
                 //On login get friends and profile.
-                mSimpleFacebook.getProfile(onProfileListener);
-                mSimpleFacebook.getFriends(onFriendsListener);
+                //mSimpleFacebook.getProfile(onProfileListener);
+                //mSimpleFacebook.getFriends(onFriendsListener);
 
+                AsyncHttpClient client = new AsyncHttpClient();
+                client.addHeader("authorization", "Bearer " + accessToken);
+                client.addHeader("Accept", "application/json");
+
+                client.post(MyApplication.SERVER_URL + "/auth/facebook/token", new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                        try {
+                            mIsLoggedIn = true;
+
+                            editEmail.setText(response.getJSONObject("facebook").getString("email"));
+                            editName.setText(response.getJSONObject("facebook").getString("name"));
+                            mFbAccessToken = response.getJSONObject("facebook").getString("token");
+                            mFbId = response.getJSONObject("facebook").getString("id");
+                            mUserId = response.getString("_id");
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                        Toast.makeText(LoginActivity.this, "Exception: " + responseString, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }
 
@@ -263,9 +276,9 @@ public class LoginActivity extends Activity {
         @Override
         public void onFail(String reason) {
             // failed to login
-            Log.i("myapp", "login fail");
+            Log.i("myapp", "login fail: " + reason);
             //mMenu.findItem(R.id.menu_facebook).setEnabled(true);
-            Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, "Login failed: " + reason, Toast.LENGTH_SHORT).show();
             tvFacebook.setText("Not connected to FB. Login failed.");
             mIsLoggedIn = false;
         }

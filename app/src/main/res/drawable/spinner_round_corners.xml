@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="transparent">
+
+    <item >
+        <shape android:shape="rectangle"  >
+            <corners android:radius="10dip" />
+            <stroke android:width="2dip" android:color="#ffffff" />
+            <solid android:color="#000000"/>
+            <!--<gradient android:angle="-90" android:startColor="#000000" android:endColor="#333333" /> -->
+        </shape>
+    </item>
+
+    <item>
+        <bitmap
+            android:src="@drawable/ic_arrow_drop_down"
+            android:gravity="right|center_vertical"
+            android:tileMode="disabled"/>
+    </item>
+
+</layer-list>

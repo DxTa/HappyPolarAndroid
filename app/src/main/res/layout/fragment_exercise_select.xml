@@ -15,8 +15,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <Spinner
+            <TextView
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:nestedScrollingEnabled="true"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="20dp"
+                android:textSize="19dp"
+                android:text="Select Exercise"/>
+
+            <Spinner
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinnerExercises"
                 android:layout_centerHorizontal="true"
@@ -25,7 +35,14 @@
                 android:gravity="center_horizontal"
                 android:layout_gravity="center_horizontal"
                 android:textAlignment="gravity"
-                android:layout_marginTop="20dp"/>
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"/>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#555555" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -39,34 +56,16 @@
 
             <ImageView
                 android:id="@+id/imageExercise"
-                android:layout_width="350dp"
-                android:layout_height="250dp"
+                android:layout_width="300dp"
+                android:layout_height="180dp"
                 android:scaleType="fitCenter"
                 android:layout_gravity="center_horizontal"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Calorie Target"
-                android:id="@+id/tvCalorieTarget"
-                android:layout_below="@+id/spinnerExercises"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp" />
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:inputType="number"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:hint="Eg. 50"
-                android:ems="10"
-                android:id="@+id/numCalorieTarget"
-                android:layout_below="@+id/tvCalorieTarget"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="2dp" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#555555"
+                android:layout_marginTop="20dp"/>
 
             <Button
                 android:layout_width="100dp"

@@ -9,11 +9,16 @@ import java.util.Date;
  */
 public class DateUtility {
 
-    private static String isoFormat = "yyyy-MM-dd'T'HH:mmZ";
+    private static String isoFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-    public static Date getDateFromISOString(String isoStringDate) throws ParseException {
+    public static Date getDateFromISOString(String isoStringDate) {
         SimpleDateFormat sdf = new SimpleDateFormat(isoFormat);
-        Date date = sdf.parse(isoStringDate);
+        Date date = null;
+        try {
+            date = sdf.parse(isoStringDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         return date;
     }
 

@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class HomeActivity extends ActionBarActivity {
@@ -66,7 +68,7 @@ public class HomeActivity extends ActionBarActivity {
             @Override
             public void onDismiss(DialogInterface dialog) {
                 if (!dialogClicked) {
-                    dialogBuilder.create().show();
+                    //dialogBuilder.create().show();
                 }
             }
         });
@@ -84,6 +86,9 @@ public class HomeActivity extends ActionBarActivity {
 
         Button btnStartExercise = (Button) findViewById(R.id.btnStartExercise);
         btnStartExercise.setOnClickListener(btnClickListener);
+
+        Button btnGo = (Button) findViewById(R.id.btnGo);
+        btnGo.setOnClickListener(btnClickListener);
     }
 
     @Override
@@ -103,11 +108,28 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_home, menu);
         mMenu = menu;
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.menu_profile:
+                //Open edit profile activity
+                Intent intentEditProfile = new Intent(HomeActivity.this, EditProfileActivity.class);
+                startActivity(intentEditProfile);
+                break;
+
+            case R.id.menu_pair_device:
+                //Open pair device activity
+                Intent intentPairDevice = new Intent(HomeActivity.this, PairDeviceActivity.class);
+                startActivity(intentPairDevice);
+                break;
+        }
+        return true;
+    }
 
     private Button.OnClickListener btnClickListener = new Button.OnClickListener() {
         @Override
@@ -120,6 +142,26 @@ public class HomeActivity extends ActionBarActivity {
                         pairHeartRateDevice();
                     } else {
                         intent = new Intent(HomeActivity.this, ExerciseActivity.class);
+                        startActivity(intent);
+                    }
+                    break;
+
+
+                case R.id.btnGo:
+                    Spinner spinnerMenu = (Spinner) findViewById(R.id.spinnerMenu);
+                    String selectedMenuItem = spinnerMenu.getSelectedItem().toString();
+
+                    if(selectedMenuItem.equals(getResources().getString(R.string.exercise_history))) {
+                        intent = new Intent(HomeActivity.this, SessionsListActivity.class);
+                        startActivity(intent);
+                    } else if(selectedMenuItem.equals(getResources().getString(R.string.start_exercise))) {
+                        Button btnStartEx = (Button) findViewById(R.id.btnStartExercise);
+                        btnStartEx.performClick();
+                    } else if(selectedMenuItem.equals(getResources().getString(R.string.edit_profile))) {
+                        intent = new Intent(HomeActivity.this, EditProfileActivity.class);
+                        startActivity(intent);
+                    } else if(selectedMenuItem.equals(getResources().getString(R.string.pair_device))) {
+                        intent = new Intent(HomeActivity.this, PairDeviceActivity.class);
                         startActivity(intent);
                     }
                     break;

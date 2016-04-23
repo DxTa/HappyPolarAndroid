@@ -17,19 +17,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aalto.happypolar.util.DateUtility;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.google.gson.JsonObject;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
@@ -52,9 +49,9 @@ public class ExerciseProgressFragment extends Fragment {
     private Integer mSecondsElapsed;
 
     private TextView tvTimer, tvCalories, tvHeartRate;
-    private LineChart lineChartHR;
+    private GraphView lineChartHR;
 
-    private LineData lineDataHR;
+    private LineGraphSeries<DataPoint> lineDataHR;
 
     private Handler mHandlerTimer = new Handler();
 
@@ -79,7 +76,7 @@ public class ExerciseProgressFragment extends Fragment {
       end_time: ISODate format?,
       slot: [
         {
-          secondsElapsed: Number,
+          seconds_elapsed: Number,
           heart_rate: Number,
           location: {
             lat: Number,
@@ -130,7 +127,7 @@ public class ExerciseProgressFragment extends Fragment {
         btnStop.setOnClickListener(onButonClickListener);
         btnCancel.setOnClickListener(onButonClickListener);
 
-        mtargetCalories = getArguments().getInt(ExerciseActivity.TARGET_CALORIES);
+        //mtargetCalories = getArguments().getInt(ExerciseActivity.TARGET_CALORIES);
         mExerciseType = getArguments().getString(ExerciseActivity.EXERCISE_TYPE);
         mExerciseId = getArguments().getString(ExerciseActivity.EXERCISE_ID);
 
@@ -149,13 +146,16 @@ public class ExerciseProgressFragment extends Fragment {
         tvTimer = (TextView) getActivity().findViewById(R.id.tvTime);
         tvCalories = (TextView) getActivity().findViewById(R.id.tvCalories);
         tvHeartRate = (TextView) getActivity().findViewById(R.id.tvHeartRate);
-        lineChartHR = (LineChart) getActivity().findViewById(R.id.lineChartHeartRate);
+        lineChartHR = (GraphView) getActivity().findViewById(R.id.lineChartHeartRate);
 
-        lineChartHR.setData(new LineData());
-        lineDataHR = lineChartHR.getLineData();
-        lineDataHR.addDataSet(new LineDataSet(null, "Heart Rate"));
-        lineChartHR.setVisibleXRangeMaximum(60);
+        lineDataHR = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                new DataPoint(0,0)
+        }); //For now an empty line chart
 
+        lineChartHR.addSeries(lineDataHR);
+        lineChartHR.getViewport().setXAxisBoundsManual(true);
+        lineChartHR.getViewport().setMinX(0);
+        lineChartHR.getViewport().setMaxX(60);
 
         /*Build the session object (to be sent to server later) */
         jsonSession = new JSONObject();
@@ -210,7 +210,7 @@ public class ExerciseProgressFragment extends Fragment {
                 //Build add slot entry
                 JSONObject jsonSlotEntry = new JSONObject();
                 try {
-                    jsonSlotEntry.put("secondsElapsed", mSecondsElapsed);
+                    jsonSlotEntry.put("seconds_elapsed", mSecondsElapsed);
                     jsonSlotEntry.put("heart_rate", mheartRate);
                     //Put the entry in the slot
                     jsonSlot.put(jsonSlotEntry);
@@ -235,10 +235,7 @@ public class ExerciseProgressFragment extends Fragment {
                     tvCalories.setText(String.format("%.0f", mCaloriesBurned));
                     tvTimer.setText(DateUtils.formatElapsedTime(mSecondsElapsed));
 
-                    lineDataHR.addXValue(mSecondsElapsed.toString());
-                    lineDataHR.addEntry(new Entry((float) mheartRate, lineDataHR.getDataSetByIndex(0).getEntryCount()), 0);
-                    lineChartHR.notifyDataSetChanged();
-                    lineChartHR.moveViewToX(lineDataHR.getXValCount() - 61);
+                    lineDataHR.appendData(new DataPoint(mSecondsElapsed, mheartRate), true, 60);
                 }
             });
         } catch (NullPointerException ex) {
@@ -268,7 +265,7 @@ public class ExerciseProgressFragment extends Fragment {
                     //calculate min, max, avg heart rate
                     Integer minHR = 999, maxHR = 0, currHR;
                     for (int i = 0; i < jsonSlot.length(); i++) {
-                        currHR = jsonSlot.getJSONObject(i).getInt("heartRate");
+                        currHR = jsonSlot.getJSONObject(i).getInt("heart_rate");
                         minHR = (minHR >= currHR) ? currHR : minHR;  //Bad programming? Unreadable?
                         maxHR = (maxHR <= currHR) ? currHR : maxHR;  //conditional assignment is nice :)
                     }
@@ -282,18 +279,20 @@ public class ExerciseProgressFragment extends Fragment {
 
                     //Now call api to save the exercise session
                     AsyncHttpClient client = new AsyncHttpClient();
+                    client.addHeader("authorization", "Bearer " + mUserProfile.getFbAccessToken());
 
                     client.post(getActivity(), MyApplication.SERVER_URL + "/sessions", new StringEntity(jsonSession.toString()), "application/json",
-                            new AsyncHttpResponseHandler() {
+                            new JsonHttpResponseHandler() {
                                 @Override
-                                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                                    //To Summary
-                                    mListener.onExerciseFinished(mExerciseId, mExerciseType, mtargetCalories, mCaloriesBurned, mHeartRateAvg, tvTimer.getText().toString(), jsonSession);
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    super.onSuccess(statusCode, headers, response);
+                                    mListener.onExerciseFinished(mExerciseId, mExerciseType, mCaloriesBurned, mHeartRateAvg, tvTimer.getText().toString(), jsonSession);
                                 }
 
                                 @Override
-                                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                                    Toast.makeText(getActivity(), "Failed to save", Toast.LENGTH_SHORT).show();
+                                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                    super.onFailure(statusCode, headers, responseString, throwable);
+                                    Toast.makeText(getActivity(), "Failed to save: " + responseString, Toast.LENGTH_SHORT).show();
                                 }
                             });
                 } catch (JSONException e) {
@@ -325,7 +324,7 @@ public class ExerciseProgressFragment extends Fragment {
     }
 
 
-    public void onButtonClick(View v) {
+    public void onBtnClick(View v) {
         switch (v.getId()) {
 
             case R.id.btnCancel:
@@ -343,7 +342,7 @@ public class ExerciseProgressFragment extends Fragment {
     Button.OnClickListener onButonClickListener = new Button.OnClickListener() {
         @Override
         public void onClick(View v) {
-            onButtonClick(v);
+            onBtnClick(v);
         }
     };
 

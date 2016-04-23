@@ -9,12 +9,11 @@ import java.util.Date;
  * Interface for Exercise Fragments
  */
 public interface OnExerciseFragmentInterface {
-    void onExerciseSelected(String exerciseId, String exerciseType, Integer targetCalories);
+    void onExerciseSelected(String exerciseId, String exerciseType);
 
     void onExerciseFinished(
             String exerciseId,
             String exerciseType,
-            Integer targetCalories,
             Double caloriesBurned,
             Integer heartRateAvg,
 

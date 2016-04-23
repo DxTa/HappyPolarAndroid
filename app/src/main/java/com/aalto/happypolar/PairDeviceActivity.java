@@ -106,6 +106,7 @@ public class PairDeviceActivity extends ActionBarActivity {
             dialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(PairDeviceActivity.this, "Connecting...", Toast.LENGTH_LONG).show();
                     HeartRateDevice.initializeInstance(getApplicationContext(), btDevice, connectionListener);
                 }
             });
