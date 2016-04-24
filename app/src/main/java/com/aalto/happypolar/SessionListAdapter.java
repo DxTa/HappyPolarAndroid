@@ -14,7 +14,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Gaurav on 22-Apr-16.
@@ -53,7 +55,9 @@ public class SessionListAdapter extends ArrayAdapter<JSONArray> {
                 }
             }
 
-            txtSessionDate.setText(DateUtility.getDateFromISOString(jsonSession.getString("start_time")).toString());
+            Date date = DateUtility.getDateFromISOString(jsonSession.getString("start_time"));
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d, hh:mm");
+            txtSessionDate.setText(sdf.format(date));
             txtCalories.setText(String.format("%.0f calories burned", jsonSession.getDouble("calories")));
 
         } catch (JSONException e) {

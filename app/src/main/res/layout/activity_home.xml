@@ -128,6 +128,19 @@
                 android:layout_marginLeft="80dp"
                 android:layout_marginRight="80dp"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last 5 Days Summary"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/textView2" />
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/graphDailyCalories"
+                android:layout_width="match_parent"
+                android:layout_height="150dip"
+                android:title="Daily Calories Burned" />
+
         </LinearLayout>
     </ScrollView>
 

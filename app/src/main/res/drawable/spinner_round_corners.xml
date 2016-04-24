@@ -13,6 +13,8 @@
 
     <item>
         <bitmap
+            android:height="10dp"
+            android:width="10dp"
             android:src="@drawable/ic_arrow_drop_down"
             android:gravity="right|center_vertical"
             android:tileMode="disabled"/>

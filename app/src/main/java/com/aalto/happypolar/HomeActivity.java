@@ -13,6 +13,26 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.aalto.happypolar.util.DateUtility;
+import com.jjoe64.graphview.DefaultLabelFormatter;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
+import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.DataPoint;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import cz.msebera.android.httpclient.Header;
 
 public class HomeActivity extends ActionBarActivity {
     private Menu mMenu;
@@ -22,6 +42,8 @@ public class HomeActivity extends ActionBarActivity {
     private UserProfile mUserProfile;
 
     private boolean dialogClicked = false;
+
+    private GraphView graphDailyCalories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +57,15 @@ public class HomeActivity extends ActionBarActivity {
 
         TextView tvGreeting = (TextView) findViewById(R.id.tvGreeting);
         tvGreeting.setText("Hello, " + mUserProfile.getName().split(" ")[0]); //only display the first name
+
+        Button btnStartExercise = (Button) findViewById(R.id.btnStartExercise);
+        btnStartExercise.setOnClickListener(btnClickListener);
+
+        Button btnGo = (Button) findViewById(R.id.btnGo);
+        btnGo.setOnClickListener(btnClickListener);
+
+        graphDailyCalories = (GraphView) findViewById(R.id.graphDailyCalories);
+        loadSummary();
 
         if (!HeartRateDevice.isConnected()) {
             pairHeartRateDevice();
@@ -76,6 +107,73 @@ public class HomeActivity extends ActionBarActivity {
         dialogBuilder.create().show();
     }
 
+    private void loadSummary() {
+        final BarGraphSeries<DataPoint> summarySeries = new BarGraphSeries<DataPoint>();
+        graphDailyCalories.addSeries(summarySeries);
+        //graphDailyCalories.setTitle("Daily Summary");
+        graphDailyCalories.getGridLabelRenderer().setHorizontalAxisTitle("Date");
+        graphDailyCalories.getGridLabelRenderer().setVerticalAxisTitle("Calories");
+        graphDailyCalories.getGridLabelRenderer().setNumHorizontalLabels(5); // only 4 because of the space
+
+        summarySeries.setDrawValuesOnTop(true);
+
+        graphDailyCalories.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+            @Override
+            public String formatLabel(double value, boolean isValueX) {
+                if (isValueX) {
+                    return DateUtility.getMMMd(new Date((long) value));
+                } else {
+                    return super.formatLabel(value, isValueX);
+                }
+            }
+        });
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.addHeader("authorization", "Bearer " + mUserProfile.getFbAccessToken());
+        client.get(MyApplication.SERVER_URL + "/users/" + mUserProfile.getId() + "/sessions", new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
+
+                Date todayDate = new Date();
+
+                for (int decr = 4; decr >= 0; decr--) { //last 5 days including today
+                    Date currentDate = DateUtility.decrementDate(todayDate, decr);
+
+                    double caloriesBurned = 0;
+                    for (int i = 0; i < response.length(); i++) {
+                        try {
+                            JSONObject jsonSession = response.getJSONObject(i);
+                            Date sessionDate = DateUtility.getDateFromISOString(jsonSession.getString("start_time"));
+                            if (DateUtility.isSameDay(currentDate, sessionDate)) {
+                                caloriesBurned = caloriesBurned + jsonSession.getDouble("calories");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    summarySeries.appendData(new DataPoint(currentDate, caloriesBurned), false, 5);
+                }
+                summarySeries.setSpacing(10);
+                graphDailyCalories.getViewport().setXAxisBoundsManual(true);
+                double xInterval=1.0;
+                if (summarySeries instanceof BarGraphSeries ) {
+// Shunt the viewport, per v3.1.3 to show the full width of the first and last bars.
+                    graphDailyCalories.getViewport().setMinX(summarySeries.getLowestValueX() - (xInterval/2.0));
+                    graphDailyCalories.getViewport().setMaxX(summarySeries.getHighestValueX() + (xInterval/2.0));
+                } else {
+                    graphDailyCalories.getViewport().setMinX(summarySeries.getLowestValueX() );
+                    graphDailyCalories.getViewport().setMaxX(summarySeries.getHighestValueX());
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+        });
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -83,12 +181,6 @@ public class HomeActivity extends ActionBarActivity {
             HeartRateDevice hrDevice = HeartRateDevice.getInstance();
             hrDevice.addHeartRateListener(heartRateListener);
         }
-
-        Button btnStartExercise = (Button) findViewById(R.id.btnStartExercise);
-        btnStartExercise.setOnClickListener(btnClickListener);
-
-        Button btnGo = (Button) findViewById(R.id.btnGo);
-        btnGo.setOnClickListener(btnClickListener);
     }
 
     @Override
