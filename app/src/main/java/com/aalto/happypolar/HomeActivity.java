@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,10 @@ public class HomeActivity extends ActionBarActivity {
     private boolean dialogClicked = false;
 
     private GraphView graphDailyCalories;
+    private ImageView imageHeart;
+    private BarGraphSeries<DataPoint> summarySeries;
+
+    private boolean heartBeatFlag = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,19 +63,22 @@ public class HomeActivity extends ActionBarActivity {
         TextView tvGreeting = (TextView) findViewById(R.id.tvGreeting);
         tvGreeting.setText("Hello, " + mUserProfile.getName().split(" ")[0]); //only display the first name
 
+        imageHeart = (ImageView) findViewById(R.id.imageHeart);
+
         Button btnStartExercise = (Button) findViewById(R.id.btnStartExercise);
         btnStartExercise.setOnClickListener(btnClickListener);
 
         Button btnGo = (Button) findViewById(R.id.btnGo);
         btnGo.setOnClickListener(btnClickListener);
 
-        graphDailyCalories = (GraphView) findViewById(R.id.graphDailyCalories);
-        loadSummary();
-
         if (!HeartRateDevice.isConnected()) {
             pairHeartRateDevice();
         }
 
+        graphDailyCalories = (GraphView) findViewById(R.id.graphDailyCalories);
+        summarySeries = new BarGraphSeries<DataPoint>();
+        graphDailyCalories.addSeries(summarySeries);
+        loadSummary();
     }
 
     private void pairHeartRateDevice () {
@@ -108,14 +116,10 @@ public class HomeActivity extends ActionBarActivity {
     }
 
     private void loadSummary() {
-        final BarGraphSeries<DataPoint> summarySeries = new BarGraphSeries<DataPoint>();
-        graphDailyCalories.addSeries(summarySeries);
         //graphDailyCalories.setTitle("Daily Summary");
         graphDailyCalories.getGridLabelRenderer().setHorizontalAxisTitle("Date");
         graphDailyCalories.getGridLabelRenderer().setVerticalAxisTitle("Calories");
         graphDailyCalories.getGridLabelRenderer().setNumHorizontalLabels(5); // only 4 because of the space
-
-        summarySeries.setDrawValuesOnTop(true);
 
         graphDailyCalories.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
             @Override
@@ -154,6 +158,7 @@ public class HomeActivity extends ActionBarActivity {
                     }
                     summarySeries.appendData(new DataPoint(currentDate, caloriesBurned), false, 5);
                 }
+                summarySeries.setDrawValuesOnTop(true);
                 summarySeries.setSpacing(10);
                 graphDailyCalories.getViewport().setXAxisBoundsManual(true);
                 double xInterval=1.0;
@@ -269,6 +274,13 @@ public class HomeActivity extends ActionBarActivity {
                 public void run() {
                     tvHeartRate.setText(heartRate.toString());
                     tvHeartRate.invalidate();
+                    if (heartBeatFlag == true) {
+                        heartBeatFlag = false;
+                        imageHeart.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart));
+                    } else {
+                        heartBeatFlag = true;
+                        imageHeart.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart2));
+                    }
                 }
             });
             Log.i("myapp", "Heart Rate " + heartRate.toString());

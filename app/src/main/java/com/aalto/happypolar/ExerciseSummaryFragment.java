@@ -116,6 +116,9 @@ public class ExerciseSummaryFragment extends Fragment {
             lineChartHR.getViewport().setMinX(0);
             lineChartHR.getViewport().setMaxX(60);
             lineChartHR.setHorizontalScrollBarEnabled(true);
+            lineChartHR.getGridLabelRenderer().setHorizontalAxisTitle("Seconds elapsed");
+            lineChartHR.getGridLabelRenderer().setVerticalAxisTitle("Beats per min");
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

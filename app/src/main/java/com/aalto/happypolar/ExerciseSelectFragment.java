@@ -78,6 +78,7 @@ public class ExerciseSelectFragment extends Fragment {
         imageExercise = (ImageView) getView().findViewById(R.id.imageExercise);
 
         AsyncHttpClient client = new AsyncHttpClient();
+        client.addHeader("authorization", "Bearer " + UserProfile.getInstance().getFbAccessToken());
         client.get(MyApplication.SERVER_URL + "/exercises", new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -121,6 +122,8 @@ public class ExerciseSelectFragment extends Fragment {
             try {
                 JSONObject jsonEx = jsonExercises.getJSONObject(position);
                 tvDescription.setText(jsonEx.getString("description"));
+
+                imageExercise.setImageResource(android.R.color.transparent);
                 //Download the image now
                 AsyncHttpClient client = new AsyncHttpClient();
                 client.get(jsonEx.getString("image"), new AsyncHttpResponseHandler() {

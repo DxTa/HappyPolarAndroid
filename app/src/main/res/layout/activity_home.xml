@@ -51,7 +51,7 @@
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:id="@+id/imageView"
+                        android:id="@+id/imageHeart"
                         android:src="@drawable/ic_heart"></ImageView>
                 </LinearLayout>
             </LinearLayout>

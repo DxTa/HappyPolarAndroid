@@ -20,7 +20,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class MyApplication extends Application {
     //public static final String SERVER_URL = "http://happypolar.fi:3000/api";
-    public static final String SERVER_URL = "http://82.130.13.85:3000/api";
+    public static final String SERVER_URL = "http://52.169.186.97/api";
     public static final String SETTINGS_NAME = "HappyPolarSettings";
     private static SharedPreferences mSettings;
 

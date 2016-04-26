@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +51,8 @@ public class ExerciseProgressFragment extends Fragment {
 
     private TextView tvTimer, tvCalories, tvHeartRate;
     private GraphView lineChartHR;
+    private ImageView imageHeart;
+    private boolean heartBeatFlag = true;
 
     private LineGraphSeries<DataPoint> lineDataHR;
 
@@ -121,6 +124,8 @@ public class ExerciseProgressFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        imageHeart = (ImageView) getActivity().findViewById(R.id.imageHeart);
+
         //set onclick listeners
         Button btnStop = (Button) getActivity().findViewById(R.id.btnStop);
         Button btnCancel = (Button) getActivity().findViewById(R.id.btnCancel);
@@ -156,6 +161,8 @@ public class ExerciseProgressFragment extends Fragment {
         lineChartHR.getViewport().setXAxisBoundsManual(true);
         lineChartHR.getViewport().setMinX(0);
         lineChartHR.getViewport().setMaxX(60);
+        lineChartHR.getGridLabelRenderer().setHorizontalAxisTitle("Seconds elapsed");
+        lineChartHR.getGridLabelRenderer().setVerticalAxisTitle("Beats per min");
 
         /*Build the session object (to be sent to server later) */
         jsonSession = new JSONObject();
@@ -236,6 +243,15 @@ public class ExerciseProgressFragment extends Fragment {
                     tvTimer.setText(DateUtils.formatElapsedTime(mSecondsElapsed));
 
                     lineDataHR.appendData(new DataPoint(mSecondsElapsed, mheartRate), true, 60);
+
+                    //Beat the heart icon :)
+                    if (heartBeatFlag == true) {
+                        heartBeatFlag = false;
+                        imageHeart.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart));
+                    } else {
+                        heartBeatFlag = true;
+                        imageHeart.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart2));
+                    }
                 }
             });
         } catch (NullPointerException ex) {
@@ -307,8 +323,7 @@ public class ExerciseProgressFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialogResponded = true;
-                getActivity().finish();
-            }
+                mListener.onExerciseFinished(mExerciseId, mExerciseType, mCaloriesBurned, mHeartRateAvg, tvTimer.getText().toString(), jsonSession);            }
         });
 
         dialogBuilder.setOnDismissListener(new DialogInterface.OnDismissListener() {

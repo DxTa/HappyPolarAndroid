@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.format.DateUtils;
+import android.widget.Toast;
 
 import com.aalto.happypolar.util.DateUtility;
 
@@ -51,6 +52,8 @@ public class SessionViewActivity extends FragmentActivity implements OnExerciseF
             transaction.commit();
         } catch (JSONException e) {
             e.printStackTrace();
+            Toast.makeText(SessionViewActivity.this, "There was a problem loading the exercise data", Toast.LENGTH_SHORT).show();
+            this.finish();
         }
     }
 

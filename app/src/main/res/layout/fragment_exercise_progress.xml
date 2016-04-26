@@ -105,7 +105,8 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:src="@drawable/ic_heart"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical"
+                    android:id="@+id/imageHeart" />
 
             </LinearLayout>
 
@@ -127,7 +128,9 @@
                 android:id="@+id/lineChartHeartRate"
                 android:layout_width="match_parent"
                 android:layout_height="150dip"
-                android:title="Heart Rate" />
+                android:title="Heart Rate"
+                android:layout_margin="10dp"
+                android:padding="5dp"/>
 
             <LinearLayout
                 android:orientation="horizontal"
